@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixed Conditionals: Простой Гид</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4f46e5', // Indigo 600
+                        'accent': '#10b981',  // Emerald 500
+                        'background-light': '#f3f4f6', // Gray 100
+                        'card-bg': '#ffffff',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.background-light');
+            line-height: 1.6;
+        }
+        .section-heading {
+            border-left: 4px solid theme('colors.primary');
+        }
+        .teen-text {
+            /* Friendly, casual font size and line height */
+            font-size: 1.125rem; /* lg */
+            color: #374151; /* Gray 700 */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Firebase Setup & Auth (Mandatory for the environment) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // IMPORTANT: The environment variables are provided globally
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+        let userId = 'loading...';
+
+        window.firebaseInit = async () => {
+            if (!Object.keys(firebaseConfig).length) {
+                console.error("Firebase config is missing. Running in local mode.");
+                document.getElementById('user-id-display').textContent = 'Local User (ID: Random)';
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('error'); // Set log level
+
+                await new Promise((resolve) => {
+                    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+                        if (!user) {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        }
+                        userId = auth.currentUser?.uid || 'N/A';
+                        document.getElementById('user-id-display').textContent = `ID: ${userId}`;
+                        unsubscribe();
+                        resolve();
+                    });
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or sign-in failed:", error);
+                document.getElementById('user-id-display').textContent = 'Auth Error';
+            }
+        };
+
+        window.firebaseInit();
+    </script>
+    <!-- End of Firebase Setup -->
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center py-6 bg-primary text-white rounded-t-xl shadow-lg">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+                🔥 Mixed Conditionals: Никакой Скуки!
+            </h1>
+            <p class="mt-2 text-primary-100/80 italic">Как говорить о прошлом и настоящем в одном предложении.</p>
+        </header>
+
+        <!-- User ID Display -->
+        <div class="text-xs text-right text-gray-500 mt-2 mb-4" id="user-id-container">
+            Текущий пользователь: <span id="user-id-display">Loading...</span>
+        </div>
+
+        <!-- MAIN EXPLANATION SECTION -->
+        <div class="bg-card-bg p-6 md:p-10 rounded-xl shadow-xl space-y-8">
+
+            <section>
+                <h2 class="section-heading pl-3 text-2xl font-bold text-gray-800 mb-4">Что это вообще такое?</h2>
+                <p class="teen-text">
+                    Mixed Conditionals — это когда ты берёшь две части из разных типов условных предложений (Conditionals) и соединяешь их, потому что хочешь связать <strong>прошлое</strong> с <strong>настоящим</strong>, или <strong>настоящее</strong> с <strong>прошлым</strong>.
+                </p>
+                <p class="teen-text mt-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+                    <strong>Главное правило:</strong> Всегда смешивай *Третий* (прошлое) и *Второй* (настоящее/нереальное) типы. Другие не подходят!
+                </p>
+            </section>
+
+            <!-- TYPE 1: Past Condition → Present Result -->
+            <section>
+                <h3 class="section-heading pl-3 text-xl font-bold text-primary mb-3">1️⃣ Тип: Прошлое → Настоящий Результат</h3>
+                <p class="teen-text">
+                    Это твой главный инструмент, когда ты думаешь: "Если бы я *сделал* что-то в прошлом, то *сейчас* был бы другой результат."
+                </p>
+                <p class="teen-text font-mono mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <strong>Формула:</strong> <span class="font-bold">If + Past Perfect</span> (<span class="text-red-600">If I had studied...</span>), <span class="font-bold">...would/could + V1</span> (<span class="text-red-600">...I would be smarter now.</span>)
+                </p>
+                <p class="teen-text mt-2">
+                    <strong>Простой пример:</strong> <br>
+                    <span class="italic text-gray-600">If she hadn't missed the flight (в прошлом), she would be on vacation right now (сейчас).</span>
+                </p>
+            </section>
+
+            <!-- TYPE 2: Present Condition → Past Result -->
+            <section>
+                <h3 class="section-heading pl-3 text-xl font-bold text-primary mb-3">2️⃣ Тип: Настоящее → Прошлый Результат</h3>
+                <p class="teen-text">
+                    Этот тип нужен, когда ты говоришь, что твоя *постоянная черта* или *ситуация сейчас* повлияла на что-то *в прошлом*.
+                </p>
+                <p class="teen-text font-mono mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <strong>Формула:</strong> <span class="font-bold">If + Simple Past/Continuous</span> (<span class="text-red-600">If I were a morning person...</span>), <span class="font-bold">...would/could have + V3</span> (<span class="text-red-600">...I would have woken up early yesterday.</span>)
+                </p>
+                <p class="teen-text mt-2">
+                    <strong>Простой пример:</strong> <br>
+                    <span class="italic text-gray-600">If he weren't so shy (сейчас), he would have talked to her at the party (в прошлом).</span>
+                </p>
+            </section>
+
+            <!-- EXAMPLES TABLE -->
+            <section>
+                <h2 class="section-heading pl-3 text-2xl font-bold text-gray-800 mb-4">Таблица Примеров</h2>
+                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-primary/90 text-white">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider">Тип</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider">Условие (IF-Clause)</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider">Результат (Main Clause)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-red-600">Past → Present</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">If I had studied harder (3-й тип, прошлое)</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">I wouldn't be worried about the exam now (2-й тип, настоящее)</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">If they had saved money (3-й тип, прошлое)</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">They could buy a new phone today (2-й тип, настоящее)</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 bg-gray-50">
+                                <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-primary">Present → Past</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">If I were rich (2-й тип, настоящее)</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">I would have donated to charity last month (3-й тип, прошлое)</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 bg-gray-50">
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">Present → Past</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">If she spoke Spanish (2-й тип, настоящее)</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">She would have understood the movie last week (3-й тип, прошлое)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- COMMON MISTAKES BLOCK -->
+        <section class="mt-8 p-6 bg-red-100 border-l-4 border-red-500 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-bold text-red-700 mb-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.39 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Типичные Ошибки! (Don't do this!)
+            </h2>
+            <ul class="space-y-3 list-disc pl-5 teen-text text-red-800">
+                <li><strong>"Would have" + Present:</strong> Нельзя говорить *<s class="line-through">If I had listened, I would have be happy now.</s>* Правильно: *I would be happy now.* (Would + V1).</li>
+                <li><strong>Смешивание 1-го типа:</strong> Нельзя использовать *<s class="line-through">If I go out, I would have fun yesterday.</s>* 1-й тип всегда о будущем/настоящем! Смешиваем только 2-й и 3-й.</li>
+                <li><strong>`Were` vs `Was`:</strong> В IF-Clause для 2-го типа часто используют `were` для всех лиц (`If I were...`). Звучит круче и правильнее в формальном стиле.</li>
+            </ul>
+        </section>
+
+        <!-- INTERACTIVE EXERCISES -->
+        <div class="mt-8 space-y-8">
+            <!-- Universal Score Card -->
+            <div id="score-card" class="p-4 bg-accent/10 rounded-xl shadow-inner text-center font-bold text-lg text-accent">
+                Твои результаты: 0 / 0
+            </div>
+
+            <h2 class="section-heading pl-3 text-2xl font-bold text-gray-800 mb-4">💪 Время Практики!</h2>
+
+            <!-- Practice Container -->
+            <div id="practice-container" class="space-y-6">
+                <!-- Exercises will be rendered here -->
+            </div>
+
+            <!-- Quiz Container -->
+            <section id="quiz-section" class="hidden">
+                <h3 class="section-heading pl-3 text-xl font-bold text-primary mb-3">🧠 Мини-Квиз (5 вопросов)</h3>
+                <div id="quiz-content" class="space-y-4 p-6 bg-card-bg rounded-xl shadow-md">
+                    <!-- Quiz questions will be rendered here -->
+                </div>
+                <button onclick="submitQuiz()" class="mt-4 w-full md:w-auto px-6 py-3 bg-primary text-white font-bold rounded-lg shadow-md hover:bg-primary/90 transition duration-150">
+                    Проверить Квиз
+                </button>
+                <div id="quiz-result" class="mt-4 text-center font-bold text-lg hidden"></div>
+            </section>
+        </div>
+
+        <!-- FINAL CTA -->
+        <div class="mt-12 text-center p-6 bg-card-bg rounded-xl shadow-xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Всё понятно?</h2>
+            <p class="teen-text mb-6">
+                Теперь ты знаешь, как смешивать прошлое и настоящее! Продолжай практиковаться.
+            </p>
+            <button onclick="document.getElementById('practice-container').innerHTML = ''; document.getElementById('quiz-section').classList.remove('hidden'); renderQuiz();" class="transition duration-150 transform hover:scale-105 inline-flex items-center justify-center w-full md:w-auto px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-accent hover:bg-accent/90 shadow-2xl shadow-accent/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M10 12h.01" />
+                </svg>
+                Practice more (Начать квиз)
+            </button>
+
+            <p class="mt-8 text-sm text-gray-500">
+                Нужна дополнительная тренировка?
+            </p>
+            <a href="https://test-english.com/grammar-points/b2/mixed-conditionals/" target="_blank" class="text-primary hover:text-primary/80 font-medium underline transition duration-150">
+                Внешняя ссылка для продвинутой практики и сделано для подписчиков канала Asyl Edvibe с любовью
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA STRUCTURES ---
+        let totalCorrect = 0;
+        let totalAttempts = 0;
+        let currentExercise = 0;
+
+        const mixedConditionalsData = {
+            // Задание 1: Вставить пропущенные слова (2 варианта)
+            fillInBlanks: [
+                {
+                    id: 'fb1',
+                    text: "If I (to go) to bed earlier last night, I (not be) so sleepy now.",
+                    answers: ["had gone", "wouldn't be/would not be"],
+                    type: "Past → Present"
+                },
+                {
+                    id: 'fb2',
+                    text: "If he (to be) a better driver, he (not crash) his car yesterday.",
+                    answers: ["were", "wouldn't have crashed/would not have crashed"],
+                    type: "Present → Past"
+                },
+                {
+                    id: 'fb3',
+                    text: "She (could take) the job if she (to speak) French.",
+                    answers: ["could have taken", "spoke"],
+                    type: "Present → Past"
+                },
+            ],
+
+            // Задание 2: Соединить две части
+            matching: [
+                { id: 'm1', left: "If I weren't afraid of heights,", right: "I would have gone on the Ferris wheel with you." },
+                { id: 'm2', left: "If she had listened to the instructions,", right: "she wouldn't be doing the exercise incorrectly now." },
+                { id: 'm3', left: "If they had saved more money,", right: "they could travel the world freely." },
+                { id: 'm4', left: "If you spoke German,", right: "you would have understood that joke." },
+            ],
+
+            // Задание 3: Преобразовать (простое задание на заполнение)
+            conversion: [
+                {
+                    id: 'c1',
+                    original: "Original: I didn't finish my homework yesterday, so I can't play games now.",
+                    prompt: "Mixed: If I (to finish) my homework yesterday, I (to play) games now.",
+                    answers: ["had finished", "could play/would play"], // Added 'would play' as common alternative
+                    type: "Past → Present"
+                },
+                {
+                    id: 'c2',
+                    original: "Original: He is lazy, that's why he failed the exam last week.",
+                    prompt: "Mixed: If he (to be) not lazy, he (to pass) the exam last week.",
+                    answers: ["weren't/were not", "would have passed"],
+                    type: "Present → Past"
+                },
+            ],
+
+            // Мини-Квиз (5 вопросов)
+            quiz: [
+                {
+                    q: "1. 'If I spoke Italian, I would have translated the song.' Какой это тип?",
+                    options: ["Past → Present", "Present → Past", "Третий условный"],
+                    answer: "Present → Past"
+                },
+                {
+                    q: "2. Выберите верный глагол: 'If she ( ) to my party, she would be here now.'",
+                    options: ["came", "had come", "would come"],
+                    answer: "had come"
+                },
+                {
+                    q: "3. 'If he hadn't quit his job, he would be feeling exhausted.' Какую связь показывает это предложение?",
+                    options: ["Прошлое условие влияет на настоящий результат", "Настоящее условие влияет на прошлый результат"],
+                    answer: "Прошлое условие влияет на настоящий результат"
+                },
+                {
+                    q: "4. Выберите верный глагол: 'If they ( ) so selfish, they would have helped us with the move.'",
+                    options: ["weren't", "hadn't been", "wouldn't be"],
+                    answer: "weren't"
+                },
+                {
+                    q: "5. В какой части предложения (Main Clause) мы используем Would/Could + V1 для Mixed Conditionals?",
+                    options: ["Past → Present", "Present → Past", "В обоих типах"],
+                    answer: "Past → Present"
+                },
+            ]
+        };
+
+        // --- UTILITY FUNCTIONS ---
+
+        function updateScore() {
+            const scoreCard = document.getElementById('score-card');
+            scoreCard.textContent = `Твои результаты: ${totalCorrect} / ${totalAttempts}`;
+            if (totalAttempts > 0) {
+                const percentage = Math.round((totalCorrect / totalAttempts) * 100);
+                scoreCard.textContent += ` (${percentage}%)`;
+            }
+        }
+
+        function checkAnswer(isCorrect, elementId, correctMessage) {
+            totalAttempts++;
+            const element = document.getElementById(elementId);
+            const messageDiv = element.querySelector('.feedback-message');
+            const submitButton = element.querySelector('.submit-button');
+
+            if (isCorrect) {
+                totalCorrect++;
+                messageDiv.textContent = `🎉 Круто! Верно! (${correctMessage})`;
+                messageDiv.className = 'feedback-message mt-2 text-green-600 font-semibold';
+            } else {
+                messageDiv.textContent = `😬 Не совсем. Правильный ответ: ${correctMessage}`;
+                messageDiv.className = 'feedback-message mt-2 text-red-600 font-semibold';
+            }
+            // All practice blocks are single-attempt and locked after check
+            if (submitButton) submitButton.disabled = true;
+            updateScore();
+        }
+
+        // --- EXERCISE RENDERING FUNCTIONS ---
+
+        // 1. Fill-in-the-blanks & Conversion (Logic combined due to similar structure)
+        function renderFillInBlanks(data, startIndex) {
+            const container = document.getElementById('practice-container');
+            data.forEach((item, index) => {
+                const isConversion = item.original;
+                
+                const sourceText = isConversion ? item.prompt : item.text;
+                const textToProcess = sourceText.includes(': ') ? sourceText.split(': ')[1] : sourceText;
+
+                const questionHtml = textToProcess.replace(/\((.*?)\)/g, (match, p1) => {
+                    const inputId = `${item.id}-${index}-${p1.split(' ')[0]}`;
+                    
+                    // 1. INPUT FIELD (Поле для ввода)
+                    const inputField = `<input type="text" id="${inputId}" placeholder="Глагол..." class="inline-block w-28 md:w-36 px-2 py-1 border border-gray-300 rounded-md focus:border-primary focus:ring focus:ring-primary/20 transition duration-150">`;
+                    
+                    // 2. HIGHLIGHTED VERB IN BRACKETS (Глагол в скобках)
+                    const verbInBrackets = `<span class="text-red-600 font-bold ml-1">(${p1})</span>`;
+                    
+                    // The result is the input field followed by the highlighted verb
+                    return `${inputField} ${verbInBrackets}`;
+                });
+
+                const number = startIndex + index + 1;
+                
+                // Escape single quotes in answers for the inline JavaScript attribute.
+                const escapedAnswers = item.answers.map(a => `'${a.replace(/'/g, "\\'")}'`).join(', ');
+
+                const div = document.createElement('div');
+                div.id = item.id;
+                div.className = 'p-5 bg-card-bg rounded-xl shadow-md border-l-4 border-accent space-y-3';
+                div.innerHTML = `
+                    <p class="text-sm font-medium text-gray-500">${number}. ${isConversion ? 'Преобразуй в Mixed Conditional' : 'Заполни пропуски'} (${item.type})</p>
+                    ${isConversion ? `<p class="text-gray-600 italic">Исходное: ${item.original.split(': ')[1]}</p>` : ''}
+                    <p class="teen-text font-semibold">${questionHtml}</p>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="checkFillInBlanks('${item.id}', [${escapedAnswers}])" class="submit-button px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition duration-150">Проверить</button>
+                        <span class="feedback-message"></span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function checkFillInBlanks(id, correctAnswers) {
+            const element = document.getElementById(id);
+            const inputs = element.querySelectorAll('input[type="text"]');
+            let isCorrect = true;
+
+            inputs.forEach((input, index) => {
+                // 1. Normalize user input: lowercase, trim, replace multiple spaces with single space.
+                const userAnswer = input.value.trim().toLowerCase().replace(/\s+/g, ' ');
+                
+                // 2. Prepare acceptable answers (handling slash separation for alternatives)
+                const possibleAnswers = correctAnswers[index].split('/').map(a => a.trim().toLowerCase().replace(/\s+/g, ' '));
+                
+                // 3. Check for match
+                const matchFound = possibleAnswers.includes(userAnswer);
+
+                if (!matchFound) {
+                    isCorrect = false;
+                    input.classList.add('border-red-500');
+                    input.classList.remove('border-gray-300', 'border-green-500');
+                } else {
+                    input.classList.add('border-green-500');
+                    input.classList.remove('border-gray-300', 'border-red-500');
+                }
+                input.disabled = true; // Lock the input after check
+            });
+
+            // If the user got it wrong, the original correct answer is shown in the feedback.
+            checkAnswer(isCorrect, id, correctAnswers.join(' / '));
+        }
+
+        // 2. Matching (Drag and Drop)
+        let dragId = null;
+
+        function allowDrop(ev) { ev.preventDefault(); }
+
+        function drag(ev, id) {
+            dragId = id; // This is the ID of the Main Clause being dragged (e.g., 'm1')
+            ev.dataTransfer.setData("text/plain", id); // Added data transfer for better standard drag behavior
+        }
+
+        function drop(ev, targetId) { // targetId is the ID of the If-Clause slot (e.g., 'm1')
+            ev.preventDefault();
+            const draggedId = ev.dataTransfer.getData("text/plain") || dragId; // Get the ID of the draggable item
+            const targetElement = document.getElementById(`drop-target-${targetId}`);
+            const sourceElement = document.getElementById(`drag-source-${draggedId}`);
+
+            // 1. Check if the slot is already filled
+            if (targetElement.getAttribute('data-dropped-id')) return; 
+            if (!draggedId || !sourceElement) return;
+
+            // 2. Move element's content into the drop target
+            targetElement.innerHTML = sourceElement.textContent; // Use textContent to avoid nested HTML tags
+            targetElement.setAttribute('data-dropped-id', draggedId); // Store which item ID was dropped
+            
+            // 3. Visual changes for filled slot
+            targetElement.classList.remove('border-dashed', 'border-indigo-200');
+            targetElement.classList.add('border-indigo-500', 'border-solid', 'border-2');
+            targetElement.classList.remove('bg-indigo-50');
+            targetElement.classList.add('bg-indigo-100', 'font-medium');
+
+            // 4. Hide the source element (Main Clause option)
+            sourceElement.style.display = 'none';
+
+            dragId = null; // Reset drag ID
+        }
+
+
+        function renderMatching(data) {
+            const container = document.getElementById('practice-container');
+            const div = document.createElement('div');
+            div.id = 'matching-ex';
+            div.className = 'p-5 bg-card-bg rounded-xl shadow-md border-l-4 border-accent space-y-3';
+
+            // Shuffle the Main Clause (right) column to mix the options
+            const shuffledRights = data.map(item => ({ id: item.id, right: item.right })).sort(() => Math.random() - 0.5);
+
+            const startNumber = mixedConditionalsData.fillInBlanks.length + 1;
+            
+            let html = `<p class="text-sm font-medium text-gray-500">${startNumber}. Соедини части предложения (If-Clause + Main Clause)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                        
+                            <!-- Список А: If-Clause (Drop Target) -->
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">Список А: Условие (If-Clause)</h4>
+                                <div id="matching-left" class="space-y-3">
+                                    ${data.map((item) => `
+                                        <div class="flex items-stretch min-h-[44px]">
+                                            <div class="w-1/2 p-3 bg-gray-100 rounded-l-lg shadow-sm font-medium text-sm border-r border-gray-300">
+                                                ${item.left}
+                                            </div>
+                                            <div id="drop-target-${item.id}" 
+                                                 class="w-1/2 p-3 bg-indigo-50 rounded-r-lg shadow-sm border-2 border-dashed border-indigo-200 text-sm" 
+                                                 ondrop="drop(event, '${item.id}')" 
+                                                 ondragover="allowDrop(event)"
+                                                 data-correct-id="${item.id}"
+                                                 data-dropped-id="">
+                                                <span class="text-gray-500 italic text-sm">Перетащи результат сюда</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        
+                            <!-- Список Б: Main Clause (Draggable) -->
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">Список Б: Результат (Main Clause) - Перетащи отсюда</h4>
+                                <div id="matching-right" class="space-y-3">
+                                    ${shuffledRights.map((item) => `
+                                        <div id="drag-source-${item.id}" 
+                                             class="p-3 bg-accent/10 rounded-lg shadow-sm cursor-grab hover:bg-accent/20 transition duration-150 text-sm" 
+                                             draggable="true" 
+                                             ondragstart="drag(event, '${item.id}')">
+                                            ${item.right}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="flex items-center space-x-3 mt-4">
+                            <button onclick="checkMatching()" class="submit-button px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition duration-150">Проверить</button>
+                            <span class="feedback-message"></span>
+                        </div>
+                        `;
+            div.innerHTML = html;
+            container.appendChild(div);
+        }
+
+        function checkMatching() {
+            const container = document.getElementById('matching-ex');
+            const dropTargets = document.getElementById('matching-left').querySelectorAll('[id^="drop-target-"]');
+            const dataLength = mixedConditionalsData.matching.length;
+            let correctCount = 0;
+            let allSlotsFilled = true;
+
+            // First pass: Check if all slots are filled
+            Array.from(dropTargets).forEach(el => {
+                if (!el.getAttribute('data-dropped-id')) {
+                    allSlotsFilled = false;
+                }
+            });
+
+            if (!allSlotsFilled) {
+                container.querySelector('.feedback-message').textContent = '⚠️ Заполни все ячейки, чтобы проверить!';
+                container.querySelector('.feedback-message').className = 'feedback-message mt-2 text-red-600 font-semibold';
+                return;
+            }
+
+            // Second pass: Calculate score and apply final colors
+            Array.from(dropTargets).forEach(el => {
+                const droppedId = el.getAttribute('data-dropped-id'); // e.g., 'm1'
+                const requiredId = el.getAttribute('data-correct-id'); // e.g., 'm1'
+                
+                // Final check for correctness
+                if (droppedId === requiredId) {
+                    correctCount++;
+                    el.classList.remove('bg-indigo-100', 'bg-red-100', 'border-indigo-500', 'border-red-500');
+                    el.classList.add('bg-green-100', 'border-green-500', 'border-solid');
+                } else {
+                    el.classList.remove('bg-indigo-100', 'bg-green-100', 'border-indigo-500', 'border-green-500');
+                    el.classList.add('bg-red-100', 'border-red-500', 'border-solid');
+                }
+                
+                el.classList.add('pointer-events-none'); // Lock the element after checking
+            });
+
+            const isBlockCorrect = correctCount === dataLength;
+            checkAnswer(isBlockCorrect, 'matching-ex', `Верно ${correctCount} из ${dataLength}`);
+        }
+
+        // --- QUIZ FUNCTIONS ---
+
+        function renderQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            quizContent.innerHTML = ''; // Clear previous content
+
+            mixedConditionalsData.quiz.forEach((q, index) => {
+                const optionsHtml = q.options.map((option, optIndex) => `
+                    <label class="block cursor-pointer p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition duration-150">
+                        <input type="radio" name="q${index}" value="${option}" class="mr-2 text-primary focus:ring-primary">
+                        ${option}
+                    </label>
+                `).join('');
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'p-4 border border-gray-200 rounded-xl space-y-2';
+                questionDiv.innerHTML = `
+                    <p class="font-bold text-gray-800">${q.q}</p>
+                    <div class="space-y-2">${optionsHtml}</div>
+                `;
+                quizContent.appendChild(questionDiv);
+            });
+        }
+
+        function submitQuiz() {
+            let quizCorrect = 0;
+            const totalQuestions = mixedConditionalsData.quiz.length;
+            const quizResult = document.getElementById('quiz-result');
+            const quizContent = document.getElementById('quiz-content');
+
+            mixedConditionalsData.quiz.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                const questionDiv = quizContent.children[index];
+
+                // Remove previous colors
+                questionDiv.classList.remove('border-green-500', 'border-red-500');
+
+                if (selectedOption) {
+                    if (selectedOption.value === q.answer) {
+                        quizCorrect++;
+                        questionDiv.classList.add('border-green-500');
+                        selectedOption.parentElement.classList.add('bg-green-100');
+                    } else {
+                        questionDiv.classList.add('border-red-500');
+                        selectedOption.parentElement.classList.add('bg-red-100');
+
+                        // Highlight correct answer
+                        const correctAnswerLabel = Array.from(questionDiv.querySelectorAll('label')).find(label => label.textContent.trim() === q.answer);
+                        if (correctAnswerLabel) {
+                            correctAnswerLabel.classList.add('bg-green-200', 'font-bold');
+                        }
+                    }
+                    // Disable all options after checking
+                    questionDiv.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+                }
+            });
+
+            const submitButton = document.querySelector('#quiz-section button');
+            if (submitButton) submitButton.disabled = true;
+
+
+            quizResult.textContent = `Твой результат: ${quizCorrect} из ${totalQuestions}!`;
+            if (quizCorrect === totalQuestions) {
+                quizResult.textContent += " Просто супер! 🤩";
+                quizResult.className = 'mt-4 text-center font-bold text-xl text-green-600';
+            } else if (quizCorrect >= totalQuestions * 0.6) {
+                quizResult.textContent += " Хорошо, но есть куда расти! 👍";
+                quizResult.className = 'mt-4 text-center font-bold text-xl text-yellow-600';
+            } else {
+                quizResult.textContent += " Не расстраивайся, перечитай объяснение! 🤔";
+                quizResult.className = 'mt-4 text-center font-bold text-xl text-red-600';
+            }
+            quizResult.classList.remove('hidden');
+        }
+
+        // --- INITIALIZATION ---
+        function initializeExercises() {
+            // Clear previous scores
+            totalCorrect = 0;
+            totalAttempts = 0;
+            updateScore();
+
+            const container = document.getElementById('practice-container');
+            container.innerHTML = ''; // Clear practice content
+            document.getElementById('quiz-section').classList.add('hidden'); // Hide quiz initially
+
+            // Render all exercises
+            renderFillInBlanks(mixedConditionalsData.fillInBlanks, 0); // Start index 0
+            renderMatching(mixedConditionalsData.matching); // Number 4
+            renderFillInBlanks(mixedConditionalsData.conversion, mixedConditionalsData.fillInBlanks.length + mixedConditionalsData.matching.length); // Start index 5 (3 + 1 + 1)
+        }
+
+        // Wait for the DOM to be fully loaded
+        window.onload = initializeExercises;
+
+    </script>
+</body>
+</html>
